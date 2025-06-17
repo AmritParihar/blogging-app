@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout - Blogger's Paradise</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+</head>
+<body class="bg-cover bg-center bg-fixed font-sans flex justify-center items-center min-h-screen" style="background-image: url('../BloggerImage/BloggerBackgound.JPG');">
+    <!-- Logout Section -->
+    <section class="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg text-center w-full max-w-md">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4"><i class="fas fa-sign-out-alt mr-2"></i>You have been logged out</h1>
+        <p class="text-gray-600 mb-6">Thank you for visiting Blogger's Paradise. We hope to see you again soon.</p>
+        <a href="../login.html" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg inline-block" onclick="logoutUser()">
+            <i class="fas fa-sign-in-alt mr-2"></i>Back to Login
+        </a>
+    </section>
+
+    <script>
+        // Logout function to call the backend API and handle token clearing
+        async function logoutUser() {
+            try {
+                const authToken = getCookie('authToken');
+                console.log("AuthToken: ", authToken);
+                if (!authToken) {
+                    alert('Authentication token not found. Please login again.');
+                    window.location.href = '../login.html';
+                    return;
+                }
+
+                // Make logout request
+                const response = await fetch('http://localhost:3000/logoutBlogger', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    // Successfully logged out, clear the token
+                    document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    
+                    // Redirect to login page
+                    window.location.href = '../login.html';
+                } else {
+                    alert('Logout failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Logout failed');
+            }
+        }
+
+        // Function to get the value of a specific cookie
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // Ensure that when the user tries to go back, they are redirected to the login page
+        window.addEventListener('popstate', function(event) {
+            if (!document.cookie.includes('authToken')) {
+                window.location.href = '../login.html';
+            }
+        });
+
+        // On page load, check if authToken exists, otherwise redirect to login
+        window.onload = function() {
+            if (!getCookie('authToken')) {
+                window.location.href = '../login.html';
+            }
+        }
+    </script>
+</body>
+</html>

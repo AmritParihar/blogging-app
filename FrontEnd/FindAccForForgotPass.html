@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <style>
+        .bg-overlay {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9));
+        }
+        .logo {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #facc15;
+            display: flex;
+            align-items: center;
+        }
+        .logo i {
+            margin-right: 8px;
+            color: #facc15;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center min-h-screen">
+  
+  <!-- Logo Section (Centered and Larger) -->
+  <div class="logo mb-5 mt-32">
+    <i class="fas fa-feather-alt text-yellow-400"></i>
+    <span>Blogger's Paradise</span>
+  </div>
+
+    <!-- Main Content -->
+    <div class="flex-grow flex items-center justify-center w-full">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md mx-4 mt-1">
+            <h2 class="text-2xl font-bold text-center text-yellow-400 mb-4">Find Your Account</h2>
+            <form id="findAccountForm" class="space-y-4">
+                <input type="email" id="email" name="email" placeholder="Enter your email" required 
+                    class="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                <button type="submit" id="sendOtpBtn"
+                    class="w-full bg-yellow-500 text-black font-bold py-2 rounded-lg hover:bg-yellow-600 transition-all">
+                    Send OTP
+                </button>
+                <div id="loadingMessage" class="text-center text-yellow-400 hidden">Sending OTP...</div>
+                <div id="errorMessage" class="text-center text-red-500 hidden"></div>
+            </form>
+            <div class="login-link text-center mt-4">
+                <p>Remember your password? <a href="./login.html" class="text-yellow-400 hover:underline">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 bg-gray-800 mt-10">
+        <p>&copy; 2024 Blogger's Paradise. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript for Form Handling -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('findAccountForm');
+            const errorMessageElement = document.getElementById('errorMessage');
+            const loadingMessageElement = document.getElementById('loadingMessage');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                loadingMessageElement.style.display = 'block';
+
+                const formData = {
+                    email: document.getElementById('email').value,
+                };
+
+                try {
+                    const response = await fetch('http://localhost:3000/findAcountForForgotPass', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData),
+                    });
+
+                    const result = await response.json();
+                    if (response.status === 200) {
+                        window.location.href = './OTP.html';
+                    } else {
+                        throw new Error(result.error || 'An error occurred while processing your request.');
+                    }
+                } catch (error) {
+                    errorMessageElement.textContent = error.message;
+                    errorMessageElement.style.display = 'block';
+                } finally {
+                    loadingMessageElement.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

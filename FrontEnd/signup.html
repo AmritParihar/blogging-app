@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Blogger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .bg-overlay {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9));
+        }
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #facc15;
+            display: flex;
+            align-items: center;
+        }
+        .logo i {
+            margin-right: 8px;
+            color: #facc15;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen space-x-6 text-lg">
+  <!-- Logo Section (Centered and Larger) -->
+  <div class="logo mb-6 mt-1">
+    <i class="fas fa-feather-alt text-yellow-400"></i>
+    <span>Blogger's Paradise</span>
+  </div>
+
+    <div class="bg-gray-800 p-4 rounded-lg shadow-lg w-full max-w-xs mt-7">
+        <h2 class="text-2xl font-bold text-center text-yellow-400 mb-4">SIGN-UP</h2>
+        <div id="errorMessage" class="text-center text-red-500 mb-4 hidden"></div>
+        <form id="registerForm" class="space-y-4">
+            <div class="flex items-center bg-gray-700 p-2 rounded-lg">
+                <i class="fas fa-envelope mr-3"></i>
+                <input type="email" id="email" name="email" placeholder="Email" required class="bg-transparent outline-none w-full text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 text-sm" />
+            </div>
+            <div class="flex items-center bg-gray-700 p-2 rounded-lg">
+                <i class="fas fa-user mr-3"></i>
+                <input type="text" id="firstName" name="firstName" placeholder="First Name" required class="bg-transparent outline-none w-full text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 text-sm" />
+            </div>
+            <div class="flex items-center bg-gray-700 p-2 rounded-lg">
+                <i class="fas fa-user mr-3"></i>
+                <input type="text" id="lastName" name="lastName" placeholder="Last Name" required class="bg-transparent outline-none w-full text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 text-sm" />
+            </div>
+            <div class="flex items-center bg-gray-700 p-2 rounded-lg">
+                <i class="fas fa-map-marker-alt mr-3"></i>
+                <select id="state" name="state" required class="block appearance-none w-full text-white bg-gray-700 border border-gray-600 py-1 px-2 rounded leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm">
+                    <option value="" disabled selected class="text-gray-400 ">Select State</option>
+                </select>
+                
+            </div>
+            <div class="flex items-center bg-gray-700 p-2 rounded-lg">
+                <i class="fas fa-map-marker-alt mr-3"></i>
+                <select id="city" name="city" required disabled class="block appearance-none w-full text-white bg-gray-700 border border-gray-600 py-1 px-2 rounded leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm">
+                    <option value="" disabled selected class="text-gray-400 bg-gray-20">Select City</option>
+                </select>
+                
+            </div>
+            <div class="flex items-center bg-gray-700 p-2 rounded-lg">
+                <i class="fas fa-map-pin mr-3 text-yellow-400"></i>
+                <input type="text" id="zipCode" name="zipCode" placeholder="Zip Code" required class="bg-transparent outline-none w-full text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 text-sm" />
+            </div>  
+            
+            <div class="flex items-center bg-gray-700 p-2 rounded-lg">
+                <i class="fas fa-phone mr-3"></i>
+                <input type="text" id="contact" name="contact" placeholder="Contact" required class="bg-transparent outline-none w-full text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 text-sm" />
+            </div>
+            <div class="flex items-center text-sm">
+                <input type="checkbox" id="terms" name="terms" required class="mr-2" />
+                <label for="terms" class="text-white text-xs">I agree to the <a href="./path/to/terms-and-conditions.pdf" target="_blank" class="text-yellow-400">Terms and Conditions</a>.</label>
+            </div>
+            <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-2 rounded-lg hover:bg-yellow-600 transition-all text-sm">
+                <i class="fas fa-sign-in-alt"></i> Register
+            </button>
+            <div id="loadingMessage" class="text-center text-yellow-400 hidden">Submitting...</div>
+        </form>
+    </div>
+
+    <footer class="text-center mt-8 text-sm">
+        <p>&copy; 2024 Blogger's Paradise. All rights reserved.</p>
+        <div class="space-x-4">
+            <a href="#" class="text-yellow-400"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="text-yellow-400"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-yellow-400"><i class="fab fa-snapchat-ghost"></i></a>
+            <a href="#" class="text-yellow-400"><i class="fab fa-youtube"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // Validation Functions
+        function isValidContact(contact) {
+            return /^[0-9]{10}$/.test(contact);
+        }
+    
+        function isValidZipCode(zipCode) {
+            return /^[0-9]{6}$/.test(zipCode);
+        }
+    
+        function isValidPassword(password) {
+            // At least 8 characters, one uppercase, one lowercase, one number, and one special character
+            return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+        }
+    
+        // Initial fetch for states when the page loads
+        async function fetchStates() {
+            try {
+                const response = await fetch('http://localhost:3000/states');
+                const states = await response.json();
+    
+                const stateSelect = document.getElementById('state');
+                stateSelect.innerHTML = '<option value="" disabled selected>Select State</option>';
+                states.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state.id;
+                    option.textContent = state.state;
+                    stateSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching states:', error);
+            }
+        }
+    
+        async function fetchCities(stateId) {
+            try {
+                const response = await fetch(`http://localhost:3000/cities/${stateId}`);
+                const cities = await response.json();
+    
+                const citySelect = document.getElementById('city');
+                citySelect.innerHTML = '<option value="" disabled selected>Select City</option>';
+                cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.id;
+                    option.textContent = city.city;
+                    citySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching cities:', error);
+            }
+        }
+    
+        // Event listener for state selection change
+        document.getElementById('state').addEventListener('change', function () {
+            const stateId = this.value;
+            const citySelect = document.getElementById('city');
+            if (stateId) {
+                citySelect.disabled = false;
+                fetchCities(stateId);
+            } else {
+                citySelect.innerHTML = '<option value="" disabled selected>Select City</option>';
+                citySelect.disabled = true;
+            }
+        });
+    
+        // Validation Before Submission
+        document.getElementById('registerForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+    
+            const contact = document.getElementById('contact').value;
+            const zipCode = document.getElementById('zipCode').value;
+            const password = document.getElementById('password') ? document.getElementById('password').value : '';
+            const stateSelect = document.getElementById('state');
+            const citySelect = document.getElementById('city');
+            const errorMessageElement = document.getElementById('errorMessage');
+            const loadingMessageElement = document.getElementById('loadingMessage');
+    
+            // Contact Validation
+            if (!isValidContact(contact)) {
+                errorMessageElement.textContent = 'Contact must be exactly 10 digits.';
+                errorMessageElement.style.display = 'block';
+                return;
+            }
+    
+            // Zip Code Validation
+            if (!isValidZipCode(zipCode)) {
+                errorMessageElement.textContent = 'Zip Code must be exactly 6 digits.';
+                errorMessageElement.style.display = 'block';
+                return;
+            }
+    
+            // Password Validation (if password field exists)
+            if (password && !isValidPassword(password)) {
+                errorMessageElement.textContent = 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.';
+                errorMessageElement.style.display = 'block';
+                return;
+            }
+    
+            // State and City Validation
+            if (!stateSelect.value || !citySelect.value) {
+                errorMessageElement.textContent = 'Please select both state and city.';
+                errorMessageElement.style.display = 'block';
+                return;
+            }
+    
+            // Terms and Conditions Validation
+            const termsAccepted = document.getElementById('terms').checked;
+            if (!termsAccepted) {
+                errorMessageElement.textContent = 'Please accept the terms and conditions before registering.';
+                errorMessageElement.style.display = 'block';
+                return;
+            }
+    
+            // If all validations pass, proceed with form submission
+            errorMessageElement.style.display = 'none';
+            loadingMessageElement.style.display = 'block';
+    
+            const formData = {
+                email: document.getElementById('email').value,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                city: citySelect.options[citySelect.selectedIndex].text,
+                state: stateSelect.options[stateSelect.selectedIndex].text,
+                zipCode: zipCode,
+                contact: contact,
+                termsAccepted: termsAccepted
+            };
+    
+            try {
+                const response = await fetch('http://localhost:3000/BloggerRegi', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+    
+                const result = await response.json();
+                if (response.status === 201) {
+                    window.location.href = './OTP.html';
+                } else {
+                    errorMessageElement.textContent = 'Error occurred: ' + result.error;
+                    errorMessageElement.style.display = 'block';
+                }
+            } catch (error) {
+                errorMessageElement.textContent = 'Network error: ' + error.message;
+                errorMessageElement.style.display = 'block';
+            } finally {
+                loadingMessageElement.style.display = 'none';
+            }
+        });
+    
+        // Call fetchStates when page loads
+        window.addEventListener('DOMContentLoaded', fetchStates);
+    </script>
+    
+</body>
+</html>

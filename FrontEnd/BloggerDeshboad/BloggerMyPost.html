@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Posts - Blogger's Paradise</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navbar -->
+    <nav class="bg-black bg-opacity-80 text-white py-4 px-6 flex justify-between items-center fixed w-full top-0 z-50 shadow-lg transition duration-300 ease-in-out hover:bg-opacity-90">
+        <h1 class="text-3xl font-bold flex items-center"><i class="fas fa-pen-nib mr-2"></i>Blogger's Paradise</h1>
+        <ul class="flex space-x-6 text-lg">
+          <li><a href="./BloggerHome.html" class="hover:text-orange-500 transition"><i class="fas fa-home mr-1"></i>Home</a></li>
+          <li><a href="./BloggerCreatePost.html" class="hover:text-orange-500 transition"><i class="fas fa-edit mr-1"></i>Create Post</a></li>
+          <li><a href="./BloggerMyPost.html" class="hover:text-orange-500 transition"><i class="fas fa-file-alt mr-1"></i>My Posts</a></li>
+          <li><a href="./BloggerAbout.html" class="hover:text-orange-500 transition"><i class="fas fa-info-circle mr-1"></i>About</a></li>
+          <li><a href="./BloggerContact.html" class="hover:text-orange-500 transition"><i class="fas fa-envelope mr-1"></i>Contact</a></li>
+          <li><a href="./ExploreAllPost.html" class="hover:text-orange-500 transition"><i class="fas fa-globe mr-1"></i>Explore</a></li>
+        </ul>
+        <div class="relative flex items-center space-x-6">
+            <!-- Bell Icon for Notifications -->
+            <i class="fas fa-bell text-2xl cursor-pointer relative" onclick="toggleNotificationPopup()">
+                <!-- Notification Count Badge -->
+                <span id="notificationCount" class="absolute top-0 right-0 text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">5</span>
+            </i>
+            
+            <!-- Profile Icon and Popup -->
+            <i class="fas fa-user text-2xl cursor-pointer" onclick="toggleProfilePopup()"></i>
+            <div id="profilePopup" class="hidden absolute bg-white shadow-md p-4 rounded w-40 right-0 mt-60">
+                <a href="./BloggerProfile.html" class="block py-2 text-gray-800 hover:bg-orange-500 hover:text-white"><i class="fas fa-user-circle mr-2"></i>View Profile</a>
+                <a href="./BloggerSetting.html" class="block py-2 text-gray-800 hover:bg-orange-500 hover:text-white"><i class="fas fa-cog mr-2"></i>Settings</a>
+                <a href="./Bloggerlogout.html" class="block py-2 text-gray-800 hover:bg-orange-500 hover:text-white"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+            </div>
+        </div>
+    </nav>
+    <!-- My Posts Section -->
+    <section class="container mx-auto pt-24 p-6">
+        <h2 class="text-4xl font-bold text-gray-800 mb-6 text-center">My Posts</h2>
+        <div id="postContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+        <!-- Pagination Controls -->
+        <div class="flex justify-center mt-6 space-x-4">
+            <button id="prevPage" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400" onclick="changePage(-1)">Previous</button>
+            <span id="pageInfo" class="text-gray-800 text-lg"></span>
+            <button id="nextPage" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400" onclick="changePage(1)">Next</button>
+        </div>
+    </section>
+
+    <!-- Modal for Full Post Content -->
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-3/4 lg:w-1/2">
+            <h3 id="modalTitle" class="text-3xl font-bold text-gray-800 mb-4"></h3>
+            <img id="modalImage" src="" alt="Post Image" class="w-full h-80 object-cover rounded-lg mb-4">
+            <p id="modalContent" class="text-gray-600"></p>
+            <button onclick="closeModal()" class="mt-4 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">Close</button>
+        </div>
+    </div>
+    <footer class="bg-black text-white text-center py-6 mt-6">
+        <p>&copy; 2025 Blogger's Paradise. All Rights Reserved.</p>
+        <div class="flex justify-center space-x-4 mt-2 text-xl">
+            <a href="#" class="text-white hover:text-orange-500"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="text-white hover:text-orange-500"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-white hover:text-orange-500"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-white hover:text-orange-500"><i class="fab fa-youtube"></i></a>
+        </div>
+    </footer>
+    <script>
+        let currentPage = 1;
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        async function fetchPosts(page) {
+            const authToken = getCookie('authToken');
+            if (!authToken) {
+                alert('Please log in to access the dashboard.');
+                window.location.href = '../login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/Blogger/getAllPost?page=${page}&limit=3`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const posts = data.data;
+                    const pagination = data.pagination;
+
+                    const postContainer = document.getElementById('postContainer');
+                    postContainer.innerHTML = '';
+
+                    posts.forEach(post => {
+                        const shortContent = post.post_content.split(' ').slice(0, 20).join(' ') + '...';
+
+                        // Format the created_at date
+                        const createdDate = new Date(post.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+
+                        const postElement = `
+                            <div class="bg-white p-4 rounded-lg shadow-lg hover:scale-105 transition relative">
+                                <img src="${post.image || 'default-image.jpg'}" alt="Post Image" class="w-full h-80 object-cover rounded-lg mb-4">
+                                <h3 class="text-2xl font-semibold text-gray-800">${post.post_title}</h3>
+                                <p class="text-gray-500 text-sm">Created on: ${createdDate}</p>
+                                <p class="text-gray-600 mb-4 short-content">${shortContent}</p>
+                                <div class="flex justify-between items-center">
+                                    <a href="#" class="text-orange-500 hover:underline read-more" onclick="event.preventDefault(); openModal('${post.post_title}', '${post.image}', \`${post.post_content}\`);">Read More</a>
+                                    
+                                    <!-- Edit Icon -->
+                                    <i class="fas fa-edit text-gray-600 hover:text-orange-500 cursor-pointer absolute top-4 right-4 text-xl" 
+                                       onclick="redirectToEditPost('${post.id}')"></i>
+                                </div>
+                            </div>
+                        `;
+                        postContainer.innerHTML += postElement;
+                    });
+
+                    document.getElementById('pageInfo').textContent = `Page ${pagination.currentPage} of ${pagination.totalPages}`;
+                    document.getElementById('prevPage').disabled = !pagination.hasPreviousPage;
+                    document.getElementById('nextPage').disabled = !pagination.hasNextPage;
+                }
+            } catch (error) {
+                console.error('Error fetching posts:', error);
+            }
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            fetchPosts(currentPage);
+        }
+
+        // Open Modal Function
+        function openModal(title, image, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalImage').src = image;
+            document.getElementById('modalContent').textContent = content;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        // Close Modal Function
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        // Redirect to Edit Post Page
+        function redirectToEditPost(postId) {
+            window.location.href = `./BloggerEditPost.html?post_id=${postId}`;
+        }
+
+        fetchPosts(currentPage);
+    </script>
+</body>
+</html>

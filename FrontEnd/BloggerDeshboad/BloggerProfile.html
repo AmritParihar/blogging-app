@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrontBlogger - Profile</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white font-sans">
+    <!-- Profile Section -->
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <section class="bg-gray-800 rounded-3xl shadow-2xl p-10 w-full max-w-4xl">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold text-orange-500"><i class="fas fa-user-circle mr-2"></i> Blogger Profile</h2>
+                <p class="text-gray-400">Your Personal Information</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center md:items-start justify-between">
+                <!-- Profile Photo Section -->
+                <div class="flex flex-col items-center mb-8 md:mb-0 md:w-1/3">
+                    <img src="default-profile.jpg" alt="Profile Photo" id="profilePhoto" class="rounded-full w-44 h-44 object-cover shadow-lg border-4 border-orange-500">
+                    <input type="file" id="profilePhotoUpload" accept="image/*" class="hidden">
+                    <button id="uploadButton" class="mt-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300">
+                        <i class="fas fa-camera mr-2"></i> Upload Photo
+                    </button>
+                </div>
+
+                <!-- Blogger Information -->
+                <div class="md:w-2/3 space-y-4">
+                    <div class="bg-gray-700 p-4 rounded-lg shadow hover:shadow-lg transition duration-300">
+                        <p class="text-lg"><i class="fas fa-user mr-2"></i> <span class="font-semibold">Name:</span> <span id="bloggerName">Loading...</span></p>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-lg shadow hover:shadow-lg transition duration-300">
+                        <p class="text-lg"><i class="fas fa-envelope mr-2"></i> <span class="font-semibold">Email:</span> <span id="bloggerEmail">Loading...</span></p>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-lg shadow hover:shadow-lg transition duration-300">
+                        <p class="text-lg"><i class="fas fa-map-marker-alt mr-2"></i> <span class="font-semibold">Location:</span> <span id="bloggerLocation">Loading...</span></p>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-lg shadow hover:shadow-lg transition duration-300">
+                        <p class="text-lg"><i class="fas fa-phone mr-2"></i> <span class="font-semibold">Contact:</span> <span id="bloggerContact">Loading...</span></p>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-lg shadow hover:shadow-lg transition duration-300">
+                        <p class="text-lg"><i class="fas fa-id-badge mr-2"></i> <span class="font-semibold">Role:</span> <span id="bloggerRole">Loading...</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-500 text-center py-4 mt-10">
+        <p>&copy; 2025 FrontBlogger. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.getElementById('uploadButton').addEventListener('click', () => {
+            document.getElementById('profilePhotoUpload').click();
+        });
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        async function fetchBloggerProfile() {
+            const authToken = getCookie('authToken');
+            if (!authToken) {
+                alert('Please log in to access the dashboard.');
+                window.location.href = '../login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/BloggerProfile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('bloggerName').textContent = data.userName || 'Not specified';
+                    document.getElementById('profilePhoto').src = data.profileImage || 'default-profile.jpg';
+                    document.getElementById('bloggerEmail').textContent = data.email || 'Not specified';
+                    document.getElementById('bloggerLocation').textContent = data.location || 'Location not specified';
+                    document.getElementById('bloggerContact').textContent = data.contact || 'Not specified';
+                    document.getElementById('bloggerRole').textContent = data.role || 'Not specified';
+                } else {
+                    alert('Failed to fetch profile data. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error loading profile');
+            }
+        }
+
+        window.onload = fetchBloggerProfile;
+    </script>
+</body>
+
+</html>

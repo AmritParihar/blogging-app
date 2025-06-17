@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Bloggers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-white flex flex-col min-h-screen">
+    <header class="bg-gray-800 p-5 text-center text-xl font-bold">
+        <h1><i class="fas fa-users"></i> Manage Bloggers</h1>
+        <nav class="mt-3 flex justify-center space-x-5">
+            <a href="./AdminDesh.html" class="hover:text-blue-400 transition"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="./AdminManageBlogger.html" class="hover:text-blue-400 transition"><i class="fas fa-users"></i> Manage Bloggers</a>
+            <a href="./AdminManagePosts.html" class="hover:text-blue-400 transition"><i class="fas fa-edit"></i> Manage Posts</a>
+            <a href="./Adminlogout.html" class="hover:text-red-400 transition"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </header>
+    
+    <!-- Bloggers Table Section -->
+    <section class="container mx-auto p-6">
+        <h2 class="text-2xl font-bold mb-4">Blogger List</h2>
+        <div class="overflow-x-auto">
+            <table class="table-auto w-full bg-gray-800 rounded-lg shadow-lg">
+                <thead>
+                    <tr class="bg-gray-700">
+                        <th class="p-3">ID</th>
+                        <th class="p-3">Name</th>
+                        <th class="p-3">Email</th>
+                        <th class="p-3">Status</th>
+                        <th class="p-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="bloggersTableBody">
+                    <!-- Rows will be populated here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-center p-4 mt-auto">
+        <p>&copy; 2025 Admin Panel. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript to Fetch, Display, and Delete Bloggers -->
+    <script>
+          // Check if reload is needed
+    if (localStorage.getItem('reloadManageBlogger') === 'true') {
+        // Remove the flag
+        localStorage.removeItem('reloadManageBlogger');
+
+        // Reload the page
+        location.reload();
+    }
+
+        // Function to get cookie by name
+        const getCookie = (name) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        };
+
+        // Get authToken from cookie
+        const authToken = getCookie('authToken');
+        if (!authToken) {
+            window.location.href = '../login.html';
+        }
+
+        // Function to fetch and display bloggers
+        const fetchBloggers = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/Admin/ManageBlogger', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const bloggers = await response.json();
+                const tableBody = document.getElementById('bloggersTableBody');
+                tableBody.innerHTML = "";
+
+                bloggers.forEach(blogger => {
+                    const row = document.createElement('tr');
+                    row.classList.add('border-b', 'border-gray-700', 'hover:bg-gray-700');
+
+                    const statusColor = blogger.status === 'Active' ? 'text-green-400' : 'text-red-400';
+
+                    row.innerHTML = `
+                        <td class="p-3">${blogger.id}</td>
+                        <td class="p-3">${blogger.name}</td>
+                        <td class="p-3">${blogger.email}</td>
+                        <td class="p-3 ${statusColor}">${blogger.status}</td>
+                        <td class="p-3">
+                            <button onclick="editBlogger(${blogger.id})" class="bg-blue-500 px-3 py-1 rounded hover:bg-blue-700">Edit</button>
+                            <button onclick="deleteBlogger(${blogger.id})" class="bg-red-500 px-3 py-1 rounded hover:bg-red-700 ml-2">Delete</button>
+                        </td>
+                    `;
+
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching bloggers:', error);
+            }
+        };
+
+        // Function to delete a blogger
+        const deleteBlogger = async (id) => {
+            if (confirm('Are you sure you want to delete this blogger?')) {
+                try {
+                    const response = await fetch(`http://localhost:3000/Admin/Blogger/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                            'Content-Type': 'application/json',
+                        }
+                    });
+
+                    if (response.ok) {
+                        alert('Blogger deleted successfully!');
+                        fetchBloggers(); // Refresh the blogger list
+                    } else {
+                        alert('Failed to delete blogger.');
+                    }
+                } catch (error) {
+                    console.error('Error deleting blogger:', error);
+                }
+            }
+        };
+
+        // Function to navigate to edit page
+        const editBlogger = (id) => {
+            window.location.href = `./editBlogger.html?id=${id}`;
+        };
+
+        // Load bloggers on page load
+        window.addEventListener('load', fetchBloggers);
+    </script>
+</body>
+</html>

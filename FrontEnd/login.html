@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Blogger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <style>
+        .bg-overlay {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9));
+        }
+        .logo {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #facc15;
+            display: flex;
+            align-items: center;
+        }
+        .logo i {
+            margin-right: 8px;
+            color: #facc15;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen space-x-6 text-lg">
+
+  <!-- Logo Section (Centered and Larger) -->
+  <div class="logo mb-5">
+    <i class="fas fa-feather-alt text-yellow-400"></i>
+    <span>Blogger's Paradise</span>
+  </div>
+
+    <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-96 mt-20">
+        <h2 class="text-3xl font-bold text-center text-yellow-400 mb-4">LOGIN</h2>
+        <form id="loginForm" class="space-y-4">
+            <div class="flex items-center bg-gray-700 p-3 rounded-lg">
+                <i class="fas fa-envelope mr-3"></i>
+                <input type="text" id="email" name="email" placeholder="Email" required class="bg-transparent outline-none w-full" />
+            </div>
+            <div class="flex items-center bg-gray-700 p-3 rounded-lg relative">
+                <i class="fas fa-lock mr-3"></i>
+                <input type="password" id="password" name="password" placeholder="Password" required class="bg-transparent outline-none w-full" />
+                <i class="fas fa-eye absolute right-3 cursor-pointer" id="togglePassword"></i>
+            </div>
+            <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-3 rounded-lg hover:bg-yellow-600 transition-all">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <div id="loadingMessage" class="text-center text-yellow-400 hidden">Submitting...</div>
+        </form>
+        <div class="text-center mt-4">
+            <p><a href="./FindAccForForgotPass.html" class="text-yellow-400">Forgot Password?</a></p>
+            <p>Don't have an account? <a href="./signup.html" class="text-yellow-400">Sign Up</a></p>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('loginForm');
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        const loadingMessage = document.getElementById('loadingMessage');
+
+        togglePassword.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                togglePassword.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                togglePassword.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            loadingMessage.classList.remove('hidden');
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                const response = await fetch('http://localhost:3000/BloggerLogin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                    credentials: 'include'
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    Cookies.set('authToken', result.token, { expires: 1, secure: true });
+                    const tokenPayload = JSON.parse(atob(result.token.split('.')[1]));
+                    const userRole = tokenPayload.role;
+                    window.location.href = userRole === 'Admin' ? './AdminDeshboard/AdminDesh.html' : './BloggerDeshboad/BloggerHome.html';
+                } else {
+                    alert(result.error || 'An error occurred');
+                }
+            } catch (error) {
+                alert('Network error. Please try again later.');
+            } finally {
+                loadingMessage.classList.add('hidden');
+            }
+        });
+    });
+    </script>
+</body>
+</html>
+
+
+
+
+
+

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Logout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-white flex flex-col min-h-screen">
+    <header class="bg-gray-800 p-5 text-center text-xl font-bold">
+        <h1><i class="fas fa-user-shield"></i>LOGOUT</h1>
+        <nav class="mt-3 flex justify-center space-x-5">
+            <a href="./AdminDesh.html" class="hover:text-blue-400 transition"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="./AdminManageBlogger.html" class="hover:text-blue-400 transition"><i class="fas fa-users"></i> Manage Bloggers</a>
+            <a href="./AdminManagePosts.html" class="hover:text-blue-400 transition"><i class="fas fa-edit"></i> Manage Posts</a>
+            <a href="./Adminlogout.html" class="hover:text-red-400 transition"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </header>
+    
+    <!-- Logout Section -->
+    <section class="flex-grow flex items-center justify-center">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-center w-96">
+            <h1 class="text-2xl font-bold mb-4">You have been logged out</h1>
+            <p class="mb-6">Thank you for visiting Admin Deshboard. We hope to see you again soon.</p>
+            <a href="../login.html" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition" onclick="logoutUser()">Back to Login</a>
+        </div>
+    </section>
+
+    <script>
+        async function logoutUser() {
+            try {
+                const authToken = getCookie('authToken');
+                if (!authToken) {
+                   // alert('Authentication token not found. Please login again.');
+                    window.location.href = '../login.html';
+                    return;
+                }
+
+                const response = await fetch('http://localhost:3000/Admin/logoutAdmin', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    document.cookie = 'authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    window.location.href = '../login.html';
+                } else {
+                    alert('Logout failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Logout failed');
+            }
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        window.addEventListener('popstate', function() {
+            if (!document.cookie.includes('authToken')) {
+                window.location.href = '../login.html';
+            }
+        });
+
+        window.onload = function() {
+            if (!getCookie('authToken')) {
+                window.location.href = '../login.html';
+            }
+        }
+    </script>
+</body>
+</html>

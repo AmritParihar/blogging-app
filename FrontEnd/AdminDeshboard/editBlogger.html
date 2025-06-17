@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Blogger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-gray-900 text-white flex items-center justify-center min-h-screen"
+  >
+    <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96">
+      <h2 class="text-2xl font-bold mb-4 text-center">Edit Blogger</h2>
+
+      <!-- Form for Editing Blogger -->
+      <form id="editBloggerForm" class="space-y-4">
+        <input type="hidden" id="bloggerId" />
+
+        <!-- Name -->
+        <div>
+          <label class="block text-sm font-medium">Name</label>
+          <input
+            type="text"
+            placeholder="FullName"
+            id="name"
+            class="w-full px-3 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label  class="block text-sm font-medium">Email</label>
+          <input
+            type="email"
+            placeholder="Email"
+            id="email"
+            class="w-full px-3 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled
+          />
+        </div>
+
+        <!-- Status -->
+        <div>
+          <label class="block text-sm font-medium">Status</label>
+          <select
+            id="status"
+            class="w-full px-3 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="Select">Select</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-between">
+          <button
+            type="button"
+            onclick="window.history.back()"
+            class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-700"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 bg-blue-500 rounded hover:bg-blue-700"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const bloggerId = urlParams.get("id");
+      const authToken = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("authToken="))
+        ?.split("=")[1];
+
+      // Update Blogger
+      document
+        .getElementById("editBloggerForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const updatedBlogger = {
+            name: document.getElementById("name").value,
+            status: document.getElementById("status").value
+          };
+
+          try {
+            const response = await fetch(
+              `http://localhost:3000/Admin/editBlogger/${bloggerId}`,
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${authToken}`,
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify(updatedBlogger)
+              }
+            );
+
+            if (!response.ok) throw new Error("Failed to update blogger");
+            alert("Blogger updated successfully!");
+
+            // Set a flag in localStorage
+            localStorage.setItem("reloadManageBlogger", "true");
+
+            // Redirect back to Manage Bloggers page
+            window.location.href = "./AdminManageBlogger.html";
+          } catch (error) {
+            console.error("Error updating blogger:", error);
+            alert("Failed to update blogger. Please try again.");
+          }
+        });
+
+      fetchBlogger();
+    </script>
+  </body>
+</html>
