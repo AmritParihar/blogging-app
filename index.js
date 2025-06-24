@@ -3,7 +3,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const router = require("./router/route");
 const path = require("path");
-const adminRouter = require("./router/adminRoute");
+const adminRouter = require("./router/AdminRoute");
 const bloggerRouter = require("./router/BloggerRoute")
 
 
