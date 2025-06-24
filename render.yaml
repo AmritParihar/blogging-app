@@ -8,48 +8,48 @@ services:
     startCommand: node index.js
     envVars:
       - key: SERVER
-        value: http://localhost:
+        value: "http://localhost:"
       - key: PORT
-        value: 3000
+        value: "3000"
 
       - key: SECRET_KEY
-        value: default_secret_key
+        value: "default_secret_key"
 
       - key: ADMIN_SECRET_KEY
-        value: default_admin_secret_key_12345
+        value: "default_admin_secret_key_12345"
       - key: BLOGGER_SECRET_KEY
-        value: default_blogger_secret_key_12345
+        value: "default_blogger_secret_key_12345"
 
       # Gmail
       - key: G_HOST
-        value: smtp.gmail.com
+        value: "smtp.gmail.com"
       - key: G_PORT
-        value: 587
+        value: "587"
       - key: G_FROM
-        value: lumbaramsuthar88@gmail.com
+        value: "lumbaramsuthar88@gmail.com"
       - key: G_PASS
-        value: zxmb qcak jcel lccv
+        value: "zxmb qcak jcel lccv"
 
       # Node env
       - key: NODE_ENV
-        value: production
+        value: "production"
 
       # AWS Credentials
       - key: ACCESS_KEY
-        value: AKIA44Y6CXIMLXF4R2OE
+        value: "AKIA44Y6CXIMLXF4R2OE"
       - key: SECRET_ACCESS_KEY
-        value: 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
+        value: "P42ma9fOzLo28ovvzpjUTmmJl5UpWtWiSOFLTeX6"
       - key: AWS_REGION
-        value: ap-south-1
+        value: "ap-south-1"
 
       # MySQL Cloud DB
       - key: DATABASE_HOST
-        value: sql12.freesqldatabase.com
+        value: "sql12.freesqldatabase.com"
       - key: DATABASE_NAME
-        value: sql12784836
+        value: "sql12784836"
       - key: DATABASE_USERNAME
-        value: sql12784836
+        value: "sql12784836"
       - key: DATABASE_PASSWORD
-        value: 7bVGcIbvkD
+        value: "7bVGcIbvkD"
       - key: DATABASE_PORT
-        value: 3306
+        value: "3306"
