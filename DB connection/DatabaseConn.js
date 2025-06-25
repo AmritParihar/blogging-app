@@ -1,30 +1,19 @@
 require("dotenv").config();
 const { Sequelize } = require("sequelize");
 
-// const DBConnection = new Sequelize(
-//   process.env.DATABASE,
-//   process.env.USER,
-//   process.env.PASSWORD,
-//   {
-//     host: process.env.DBHOST,
-//     dialect: process.env.DIALECT,
-//   }
-// );
-
 const DBConnection = new Sequelize(
-process.env.DATABASE_NAME,
-process.env.DATABASE_USERNAME,
-process.env.DATABASE_PASSWORD,
+  process.env.DATABASE_NAME,
+  process.env.DATABASE_USERNAME,
+  process.env.DATABASE_PASSWORD,
   {
     host: process.env.DATABASE_HOST,
     port: process.env.DATABASE_PORT,
-    dialect: process.env.DIALECT,
+    dialect: 'mysql', // Must match Sequelize supported dialects
+    logging: false, // optional: to disable SQL logs in console
   }
 );
 
-
-
-// Connect to the database
+// Test connection
 async function connectToDatabase() {
   try {
     await DBConnection.authenticate();
