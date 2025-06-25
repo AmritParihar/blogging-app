@@ -3,8 +3,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const router = require("./router/route");
 const path = require("path");
-const adminRouter = require("./router/AdminRoute");
-const bloggerRouter = require("./router/BloggerRoute")
+const adminRouter = require("./router/AdminRoute.js");
+const bloggerRouter = require("./router/BloggerRoute.js")
 
 
 const app = express();
